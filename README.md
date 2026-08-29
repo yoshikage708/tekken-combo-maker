@@ -11,6 +11,13 @@
 - 完成カードのPNG保存
 - スマートフォン対応
 
+## 公開方法（GitHub Pages）
+
+1. このフォルダーの中身をGitHubリポジトリのルートへ置く。
+2. GitHubの `Settings` → `Pages` を開く。
+3. `Deploy from a branch` を選ぶ。
+4. `main` と `/(root)` を選び、保存する。
+
 ## 権利表記
 
 本ツールは非公式のファンメイドツールです。鉄拳およびTEKKENは各権利者に帰属します。
