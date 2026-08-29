@@ -1,5 +1,48 @@
 const startTagOptions=[{id:'normal',label:'通常ヒット',color:'#58708f'},{id:'counter',label:'カウンターヒット',color:'#d94a55'},{id:'heat-dash',label:'ヒートダッシュ',color:'#b14ed0'},{id:'wall',label:'壁コンボ',color:'#d27a32'},{id:'low-parry',label:'下段捌き',color:'#3f9b78'},{id:'ground',label:'地上コンボ',color:'#6d65c7'}];
-const groups={direction:['7','8','9','4','☆','6','1','2','3'],attack:['LP','RP','LK','RK','WP','WK','LP+LK','RP+RK','RP+LK','LP+RK'],special:['最風'],separator:['>'],slide:['【','】'],movement:['前ステ','バクステ','右横移動','左横移動'],state:['立ち途中','横移動中','しゃがみ中','背向け'],stateTag:['相手ダウン中','ヒート中','壁やられ中'],stage:['壁到達','壁強','ウォールブレイク','フロアブレイク'],system:['トルネード','ヒートバースト','ヒートスマッシュ','ヒートダッシュ','レイジアーツ']};
+const characterConditions={
+  '仁':[['前心','前心']],
+  'キング':[['ジャガースプリント','JSP'],['ジャガーステップ','JST']],
+  '準':[['出雲','出雲'],['幻日','幻日'],['御阿礼','御阿礼']],
+  'ポール':[['二重潜り','二重潜り']],
+  'ロウ':[['チャージドラゴン','CD']],
+  'ジャック8':[['ガンマハウリング','GH']],
+  'ラース':[['サイレント・エントリー','SE'],['ダイナミック・エントリー','DE'],['リミテッド・エントリー','LE']],
+  'シャオユウ':[['擺歩','擺歩'],['鳳凰','鳳凰']],
+  'ニーナ':[['スウェー','スウェー']],
+  'リロイ':[['独歩','独歩']],
+  '飛鳥':[['浪花の気焔保持','気焔保持']],
+  'リリ':[['バラードステップ','BS']],
+  'ブライアン':[['スネークアイ保持','スネークアイ']],
+  'ファラン':[['右構え','右構え'],['ライトフラミンゴ','RF'],['レフトフラミンゴ','LF']],
+  'クラウディオ':[['スターバースト保持','スターバースト']],
+  'アズセナ':[['リベルタドール','LD']],
+  'レイヴン':[['ソウルフィールド','SF']],
+  'レオ':[['閃電保持','閃電保持'],['金鶏','金鶏'],['仆歩','仆歩']],
+  'スティーブ':[['ウィービング・レフト','WL'],['ウィービング・ライト','WR'],['クイックターン','QT'],['ダッキング','DUK'],['ロング・ダッキング','LDK'],['ピーカブースタイル','PKB'],['スウェー','SW'],['フリッカー','FLC'],['ライオンハート','LH']],
+  'クマ':[['ハンティングスタイル','HS'],['ベアシット','BS'],['ベアロール','BR']],
+  'パンダ':[['ハンティングスタイル','HS'],['ベアシット','BS'],['ベアロール','BR']],
+  '吉光':[['無刀ノ極','無刀'],['金打','金打'],['地雷刃','地雷刃'],['卍あぐら','卍あぐら'],['卍蜻蛉','卍蜻蛉']],
+  'シャヒーン':[['スネークイン','SI']],
+  'ドラグノフ':[['ローリングエスケープ','RE']],
+  'フェン':[['雲手','雲手'],['虚歩','虚歩']],
+  'リー':[['ヒットマン・スタイル','HS'],['ミスト・ステップ','MS']],
+  'アリサ':[['デストロイフォーム','DF'],['ブート','BT'],['デュアルブート','DB'],['バックアップ','BU']],
+  'ザフィーナ':[['モード・スケアクロウ','MS'],['モード・タランチュラ','MT'],['モード・マンティス','MM']],
+  'デビル仁':[['飛空','飛空'],['忌鴉','忌鴉']],
+  'ヴィクター':[['イアイ・ポズィション','IP'],['パフューマー','Pf']],
+  '麗奈':[['旋体','旋体'],['運足','運足'],['金剛壁','金剛壁']],
+  'エディ':[['バナネイラ','BN'],['ネガチーヴァ','NG'],['マンジンガLv.1所持','M1'],['マンジンガLv.2所持','M2']],
+  'リディア':[['天上天下の構え','天上天下'],['前虎後狼の構え','前虎後狼'],['猫足','猫足'],['騎馬立ち','騎馬立ち']],
+  '平八':[['風神呼法','風神呼法'],['雷神呼法','雷神呼法'],['武の境地時','武の境地']],
+  'クライヴ':[['バハムートウィング','BW'],['フェニックスシフト','PS'],['アップドラフト','UD']],
+  'アンナ':[['ハンマーチャンス','HC'],['カオスジャッジメント','CJ'],['プレジャータイム','PT']],
+  'ファーカムラム':[['ガルーダフォース保持','GF']],
+  'アーマーキング':[['バッドジャガー','BJ']],
+  'ミアリズ':[['モラング・ミルス','MM'],['バオバブ・ミール','BM']],
+  '州光':[['華遁','華遁'],['刹那駆け','刹那駆け']],
+  'ボブ':[['スピナーボール','SB']]
+};
+const groups={direction:['7','8','9','4','☆','6','1','2','3'],attack:['LP','RP','LK','RK','WP','WK','LP+LK','RP+RK','RP+LK','LP+RK'],special:[],separator:['>'],slide:['【','】'],movement:['前ステ','バクステ','右横移動','左横移動'],state:['立ち途中','横移動中','しゃがみ中','背向け'],stateTag:['相手ダウン中','ヒート中','壁やられ中'],stage:['壁到達','壁強','ウォールブレイク','フロアブレイク'],system:['トルネード','ヒートバースト','ヒートスマッシュ','ヒートダッシュ','レイジアーツ']};
 const titles={direction:'方向',attack:'攻撃',special:'キャラクター固有',separator:'技の区切り',slide:'スライド入力',movement:'移動',state:'入力状態',stateTag:'状態タグ',stage:'壁・ステージ',system:'システム'};
 const named={'最風':['最風','最速風神拳'],'前ステ':['66','前ステ'],'バクステ':['44','バクステ'],'右横移動':['右横','右横移動'],'左横移動':['左横','左横移動'],'立ち途中':['立ち途中','立ち途中'],'横移動中':['横移動中','横移動中'],'しゃがみ中':['しゃがみ中','しゃがみ中'],'背向け':['背向け','背向け'],'壁到達':['W!','壁到達'],'壁強':['W強','壁強'],'ウォールブレイク':['WB','ウォールブレイク'],'フロアブレイク':['FB','フロアブレイク'],'トルネード':['T!','トルネード'],'ヒートバースト':['HB','ヒートバースト'],'ヒートスマッシュ':['HS','ヒートスマッシュ'],'ヒートダッシュ':['HD','ヒートダッシュ'],'レイジアーツ':['RA','レイジアーツ']};
 const arrows={'7':'↖','8':'↑','9':'↗','4':'←','☆':'●','6':'→','1':'↙','2':'↓','3':'↘'};
@@ -12,10 +55,10 @@ function renderStartTag(){['#liveStartTag','#cardStartTag'].forEach(selector=>{c
 startTagOptions.forEach(tag=>{const button=document.createElement('button');button.className='start-choice';button.dataset.tag=tag.id;button.style.setProperty('--tag-color',tag.color);button.textContent=tag.label;button.onclick=()=>{selectedStartTag=tag;renderStartTag();persistCurrentRecipe();say(`${tag.label}を選択`)};$('#startTags').append(button)});renderStartTag();
 Object.entries(groups).forEach(([type,items])=>{const group=document.createElement('div');group.className='group';group.innerHTML=`<div class="group-title">${titles[type]}</div>${type==='direction'?'<div class="direction-mode"><button class="active" data-mode="tap">白抜き・短押し</button><button data-mode="hold">黒・長押し</button></div>':''}<div class="grid ${type==='direction'?'':'two'}"></div>`;const grid=group.querySelector('.grid'),buttons=[];items.forEach(label=>{const b=document.createElement('button');b.className=`cmd ${type}`;const paint=()=>b.innerHTML=iconHtml(label,type,directionMode==='hold');paint();buttons.push(paint);b.setAttribute('aria-label',`${label}を追加`);b.onclick=()=>{b.classList.add('pressed');setTimeout(()=>b.classList.remove('pressed'),110);const wasHold=type==='direction'&&directionMode==='hold';combo.push({label,type,hold:wasHold});render();say(`${label}${wasHold?'長押し':''} を追加`);if(wasHold){directionMode='tap';group.querySelectorAll('[data-mode]').forEach(x=>x.classList.toggle('active',x.dataset.mode==='tap'));buttons.forEach(p=>p())}};grid.append(b)});if(type==='direction')group.querySelectorAll('[data-mode]').forEach(tab=>tab.onclick=()=>{directionMode=tab.dataset.mode;group.querySelectorAll('[data-mode]').forEach(x=>x.classList.toggle('active',x===tab));buttons.forEach(p=>p())});controls.append(group)});
 const mishimaCharacters=new Set(['一八','デビル仁','麗奈','平八']);
-function updateCharacterCommands(){const special=controls.children[2];if(special)special.hidden=!mishimaCharacters.has($('#character').value)}
+function updateCharacterCommands(){const character=$('#character').value,special=controls.children[2],grid=special?.querySelector('.grid');if(!grid)return;const items=[...(mishimaCharacters.has(character)?[['最速風神拳','最風']]:[]),...(characterConditions[character]||[])];special.hidden=!items.length;grid.innerHTML='';items.forEach(([label,code])=>{const button=document.createElement('button');button.className='cmd special';button.innerHTML=`<strong>${code}</strong><small>${label}</small>`;button.setAttribute('aria-label',`${label}を追加`);button.onclick=()=>{button.classList.add('pressed');setTimeout(()=>button.classList.remove('pressed'),110);combo.push({label,type:'special',code,caption:label});render();say(`${label}を追加`)};grid.append(button)})}
 function canEdit(item){return !['separator','stateTag','slide'].includes(item.type)}
 function decorateItem(el,item,index){if(item.count>1){const count=document.createElement('b');count.className='count-badge';count.textContent=`×${item.count}`;el.append(count)}if(item.annotations?.length){const notes=document.createElement('span');notes.className='item-annotations';notes.textContent=item.annotations.join('・');el.append(notes)}if(canEdit(item)){el.classList.add('editable-token');el.classList.toggle('selected-token',selectedIndex===index);el.setAttribute('role','button');el.setAttribute('tabindex','0');el.setAttribute('aria-label',`${item.label}を編集`);const choose=e=>{e.stopPropagation();selectedIndex=index;updateEditor();render()};el.onclick=choose;el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();choose(e)}}}}
-function draw(el,empty){el.innerHTML='';if(!combo.length){el.textContent=empty;return}combo.forEach((item,index)=>{let x=document.createElement('span');if(item.type==='separator'){x.className='sep';x.textContent='>'}else if(item.type==='stateTag'){x.className='state-tag';x.textContent=item.label}else if(named[item.label]){x.className='named';x.innerHTML=`<span>${named[item.label][0]}</span><small>${named[item.label][1]}</small>`}else{x.className=`token ${item.type}-token`;x.innerHTML=iconHtml(item.label,item.type,item.hold)}decorateItem(x,item,index);el.append(x)})}
+function draw(el,empty){el.innerHTML='';if(!combo.length){el.textContent=empty;return}combo.forEach((item,index)=>{let x=document.createElement('span');if(item.type==='separator'){x.className='sep';x.textContent='>'}else if(item.type==='stateTag'){x.className='state-tag';x.textContent=item.label}else if(item.code||named[item.label]){x.className='named';x.innerHTML=`<span>${item.code||named[item.label][0]}</span><small>${item.caption||named[item.label][1]}</small>`}else{x.className=`token ${item.type}-token`;x.innerHTML=iconHtml(item.label,item.type,item.hold)}decorateItem(x,item,index);el.append(x)})}
 function recipeSnapshot(id,title){return{id,title,updatedAt:Date.now(),character:$('#character').value,damage:$('#damage').value,difficulty:$('#difficulty').value,notes:$('#notes').value,startTagId:selectedStartTag.id,combo:JSON.parse(JSON.stringify(combo))}}
 function storeRecipes(){try{localStorage.setItem(recipeStorageKey,JSON.stringify(savedRecipes))}catch(error){say('端末の保存領域を利用できませんでした')}}
 function persistCurrentRecipe(){if(!currentRecipeId)return;const at=savedRecipes.findIndex(recipe=>recipe.id===currentRecipeId);if(at<0)return;savedRecipes[at]=recipeSnapshot(currentRecipeId,savedRecipes[at].title);storeRecipes();renderRecipeList()}
@@ -56,7 +99,7 @@ function drawComboIcons(c,startX,startY,maxX){
     }else if(item.type==='stateTag'){
       c.font='800 17px "Yu Gothic",sans-serif';const w=c.measureText(item.label).width+32,[tx,ty]=next(w+12);canvasTag(c,tx,ty+10,item.label,'#326f78')
     }else{
-      const code=named[item.label]?.[0]||item.label,caption=named[item.label]?.[1]||'',w=Math.max(105,Math.min(190,caption.length*17));const [tx,ty]=next(w);c.fillStyle='#f5f7fa';c.font='900 29px "Yu Gothic",sans-serif';c.textAlign='center';c.fillText(code,tx+w/2,ty+30);c.fillStyle='#b8c0cc';c.font='700 15px "Yu Gothic",sans-serif';c.fillText(caption,tx+w/2,ty+53);c.textAlign='left'
+      const code=item.code||named[item.label]?.[0]||item.label,caption=item.caption||named[item.label]?.[1]||'',w=Math.max(105,Math.min(210,caption.length*17));const [tx,ty]=next(w);c.fillStyle='#f5f7fa';c.font='900 29px "Yu Gothic",sans-serif';c.textAlign='center';c.fillText(code,tx+w/2,ty+30);c.fillStyle='#b8c0cc';c.font='700 15px "Yu Gothic",sans-serif';c.fillText(caption,tx+w/2,ty+53);c.textAlign='left'
     }
     if(item.count>1){const [tx,ty]=next(54);c.fillStyle='#f1b84b';c.font='900 23px "Yu Gothic",sans-serif';c.fillText(`×${item.count}`,tx+2,ty+35)}
     (item.annotations||[]).forEach(note=>{c.font='800 14px "Yu Gothic",sans-serif';const w=Math.min(180,c.measureText(note).width+24),[tx,ty]=next(w+8);c.fillStyle='#543b18';c.beginPath();c.roundRect(tx,ty+14,w,27,7);c.fill();c.fillStyle='#ffd98a';c.textAlign='center';c.fillText(note,tx+w/2,ty+33);c.textAlign='left'})
