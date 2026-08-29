@@ -8,8 +8,9 @@
 </head>
 <body>
 <main class="app">
-  <header><p class="eyebrow">TEKKEN 8</p><h1>COMBO CARD MAKER</h1><p>CCM — 押した順に、伝わるコンボカードへ。</p></header>
-  <section class="live sticky"><div><small>入力確認</small><div id="live" class="combo"></div><p id="status">コマンドを入力してください</p></div><button id="undo">↶ 1つ戻す</button></section>
+  <header><p class="eyebrow">TEKKEN 8</p><h1>COMBO CARD MAKER</h1><p>コンボを、カードに。</p></header>
+  <section class="start-panel"><div class="start-heading"><strong>始動タイプ</strong><small>最初に1つ選択</small></div><div id="startTags" class="start-tags"></div></section>
+  <section class="live sticky"><div><small>入力確認</small><span id="liveStartTag" class="start-tag"></span><div id="live" class="combo"></div><p id="status">コマンドを入力してください</p></div><button id="undo">↶ 1つ戻す</button></section>
   <section class="panel"><button id="toggle" class="toggle" aria-expanded="true"><span>コマンド入力</span><span id="chevron">▲</span></button><div id="controls" class="controls"></div></section>
   <section class="fields">
     <label>キャラクター名<select id="character"><option>一八</option><option>仁</option><option>キング</option><option>準</option><option>ポール</option><option>ロウ</option><option>ジャック8</option><option>ラース</option><option>シャオユウ</option><option>ニーナ</option><option selected>リロイ</option><option>飛鳥</option><option>リリ</option><option>ブライアン</option><option>ファラン</option><option>クラウディオ</option><option>アズセナ</option><option>レイヴン</option><option>レオ</option><option>スティーブ</option><option>クマ</option><option>吉光</option><option>シャヒーン</option><option>ドラグノフ</option><option>フェン</option><option>パンダ</option><option>リー</option><option>アリサ</option><option>ザフィーナ</option><option>デビル仁</option><option>ヴィクター</option><option>麗奈</option><option>エディ</option><option>リディア</option><option>平八</option><option>クライヴ</option><option>アンナ</option><option>ファーカムラム</option><option>アーマーキング</option><option>ミアリズ</option><option>州光</option><option>ボブ</option></select></label>
@@ -17,7 +18,7 @@
     <label>難易度<select id="difficulty"><option>★☆☆☆☆</option><option selected>★★☆☆☆</option><option>★★★☆☆</option><option>★★★★☆</option><option>★★★★★</option></select></label>
     <label class="wide">POINT・注釈<textarea id="notes" rows="3" maxlength="500" placeholder="例：トルネード後は少し前ステ"></textarea><small class="comment-warning">※他者への誹謗中傷、差別的・攻撃的な表現など、不適切な内容の入力・公開はお控えください。</small></label>
   </section>
-  <section><div class="section-title"><h2>完成カード</h2><div class="actions"><button id="clear" class="quiet">全消去</button><button id="save" class="save">↓ コンボ画像を保存</button></div></div><article class="card"><div class="card-head"><div><strong id="cardCharacter">一八</strong><small>COMBO GUIDE</small></div><div class="damage"><small>DAMAGE</small><strong id="cardDamage">72</strong></div></div><div id="cardCombo" class="combo card-combo" role="button" tabindex="0" aria-label="コンボ。ダブルタップで直前の入力を削除"></div><div class="card-foot"><div><small>難易度</small><strong id="cardDifficulty">★★☆☆☆</strong></div><div><small>POINT</small><p id="cardNotes">注釈を入力するとここに表示されます。</p></div></div></article><p class="hint">完成カードのコンボ部分をダブルタップしても、直前の入力を消せます。</p></section>
+  <section><div class="section-title"><h2>完成カード</h2><div class="actions"><button id="clear" class="quiet">全消去</button><button id="save" class="save">↓ コンボ画像を保存</button></div></div><article class="card"><div class="card-head"><div><strong id="cardCharacter">一八</strong><small>COMBO GUIDE</small><span id="cardStartTag" class="start-tag"></span></div><div class="damage"><small>DAMAGE</small><strong id="cardDamage">72</strong></div></div><div id="cardCombo" class="combo card-combo" role="button" tabindex="0" aria-label="コンボ。ダブルタップで直前の入力を削除"></div><div class="card-foot"><div><small>難易度</small><strong id="cardDifficulty">★★☆☆☆</strong></div><div><small>POINT</small><p id="cardNotes">注釈を入力するとここに表示されます。</p></div></div></article><p class="hint">完成カードのコンボ部分をダブルタップしても、直前の入力を消せます。</p></section>
   <footer><p><strong>ヨシカゲ with ChatGPT</strong></p><p>CCMは無料の非公式ファンメイドツールです。鉄拳およびTEKKENは各権利者に帰属します。</p></footer>
 </main><script src="app.js"></script>
 </body></html>
