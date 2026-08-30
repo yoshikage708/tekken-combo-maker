@@ -120,8 +120,6 @@ function canvasAttackMini(c,x,y,label){const dots=attackDots[label]||[0,0,0,0],r
 function canvasTag(c,x,y,label,color){c.font='800 18px "Yu Gothic",sans-serif';const w=c.measureText(label).width+34;c.fillStyle=color;c.beginPath();c.roundRect(x,y,w,34,17);c.fill();c.fillStyle='#fff';c.textAlign='center';c.fillText(label,x+w/2,y+23);c.textAlign='left';return w}
 function drawMemoCanvas(c,text,startX,startY,maxWidth,lineHeight,maxLines=2){let x=startX,y=startY,line=0;c.font='500 21px "Yu Gothic",sans-serif';const newline=()=>{x=startX;y+=lineHeight;line++};for(const part of memoParts(text||'')){if(line>=maxLines)break;if(part.type==='text'){for(const ch of [...part.text]){if(ch==='\n'){newline();continue}const w=c.measureText(ch).width;if(x+w>startX+maxWidth)newline();if(line>=maxLines)break;c.fillStyle='#f5f7fa';c.fillText(ch,x,y);x+=w}}else{const w=part.type==='footnote'?38:part.type==='direction'?29:30;if(x+w>startX+maxWidth)newline();if(line>=maxLines)break;if(part.type==='footnote'){c.fillStyle='#173d49';c.beginPath();c.roundRect(x-2,y-21,w,24,12);c.fill();c.strokeStyle='#58bfd8';c.lineWidth=1.2;c.stroke();c.fillStyle='#a8efff';c.font='900 12px "Yu Gothic",sans-serif';c.textAlign='center';c.fillText(`※${part.label}`,x-2+w/2,y-5);c.textAlign='left'}else{c.fillStyle='#151b22';c.beginPath();c.roundRect(x-2,y-22,w,27,5);c.fill();if(part.type==='direction'){if(part.label==='☆'){c.fillStyle='#f5f7fa';c.font='20px "Yu Gothic",sans-serif';c.fillText('☆',x+3,y-2)}else canvasArrow(c,x+2,y-20,20,part.label,false)}else canvasAttackMini(c,x+5,y-19,part.label)}x+=w+4;c.font='500 21px "Yu Gothic",sans-serif'}}}
 function drawComboIcons(c,startX,startY,maxX){
-  const context=activeContextTag();
-  canvasTag(c,360,116,context.label,context.color);
   let x=startX,y=startY;const rowHeight=70,rangeSegments=new Map;
   combo.forEach(item=>{
     let baseWidth=0,code='',caption='';
@@ -161,6 +159,7 @@ function drawComboIcons(c,startX,startY,maxX){
   });
   rangeSegments.forEach(group=>{[...group.rows.values()].sort((a,b)=>a.top-b.top).forEach((row,index)=>{c.fillStyle='rgba(40,118,136,.12)';c.beginPath();c.roundRect(row.left-6,row.top-3,row.right-row.left+12,62,12);c.fill();c.strokeStyle='#58bfd8';c.lineWidth=1.5;c.stroke();if(index===0){c.font='900 13px "Yu Gothic",sans-serif';const mark=`※${group.number}`,mw=c.measureText(mark).width+14,mx=row.left-3,my=row.top-15;c.fillStyle='#173d49';c.beginPath();c.roundRect(mx,my,mw,24,12);c.fill();c.strokeStyle='#58bfd8';c.stroke();c.fillStyle='#a8efff';c.textAlign='center';c.fillText(mark,mx+mw/2,my+16);c.textAlign='left'}})});
   if(!combo.length){c.fillStyle='#9ca6b5';c.font='700 28px "Yu Gothic",sans-serif';c.fillText('コンボ未入力',startX,startY+36)}
+  return y+62;
 }
 function savePngIcons(){
   const canvas=document.createElement('canvas');canvas.width=1200;canvas.height=630;
@@ -172,7 +171,9 @@ function savePngIcons(){
   c.fillStyle='#f5f7fa';c.font=`900 44px ${font}`;c.fillText($('#character').value.trim()||'CHARACTER',105,125);
   c.fillStyle='#9ca6b5';c.font=`700 17px ${font}`;c.fillText(stringMode?'STRING GUIDE':'COMBO GUIDE',105,155);
   if(!stringMode){c.textAlign='right';c.fillText('DAMAGE',1095,92);c.fillStyle='#f1b84b';c.font=`900 58px ${font}`;c.fillText($('#damage').value||'0',1095,148);c.textAlign='left'}
-  c.strokeStyle='#2d3540';c.beginPath();c.moveTo(105,184);c.lineTo(1100,184);c.stroke();drawComboIcons(c,105,205,1095);
+  const context=activeContextTag();canvasTag(c,360,116,context.label,context.color);
+  c.strokeStyle='#2d3540';c.beginPath();c.moveTo(105,184);c.lineTo(1100,184);c.stroke();
+  const comboLayer=document.createElement('canvas');comboLayer.width=1020;comboLayer.height=620;const lc=comboLayer.getContext('2d'),comboBottom=drawComboIcons(lc,10,20,1005),contentHeight=Math.max(82,comboBottom+10),availableHeight=215,comboScale=Math.min(1,availableHeight/contentHeight);c.drawImage(comboLayer,0,0,1020,contentHeight,105,195,1020*comboScale,contentHeight*comboScale);
   c.beginPath();c.moveTo(105,420);c.lineTo(1100,420);c.stroke();c.fillStyle='#9ca6b5';c.font=`700 16px ${font}`;
   if(stringMode){c.fillText('連携メモ',105,462);drawMemoCanvas(c,$('#notes').value.trim()||'メモなし',105,500,990,30,2)}else{c.fillText('難易度',105,462);c.fillText('MEMO',340,462);c.fillStyle='#f5f7fa';c.font=`800 25px ${font}`;c.fillText($('#difficulty').value,105,503);drawMemoCanvas(c,$('#notes').value.trim()||'メモなし',340,500,755,30,2)}
   c.fillStyle=accent;c.font=`900 18px ${font}`;c.fillText('TEKKEN 8 COMBO CARD MAKER / CCM',105,555);
