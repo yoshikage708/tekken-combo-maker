@@ -72,7 +72,7 @@ function updateCharacterCommands(){const character=$('#character').value,special
 function updateCharacterAttacks(){const character=$('#character').value,grid=controls.children[1]?.querySelector('.grid');if(!grid)return;const items=['LP','RP','LK','RK','WP','WK','LP+LK','RP+RK','RP+LK','LP+RK',...(character==='ブライアン'?['LP+LK+RK']:[])];grid.innerHTML='';items.forEach(label=>{const button=document.createElement('button');button.className='cmd attack';button.innerHTML=iconHtml(label,'attack');button.setAttribute('aria-label',label==='LP+LK+RK'?'挑発（LP+LK+RK）を追加':`${label}を追加`);button.onclick=()=>{button.classList.add('pressed');setTimeout(()=>button.classList.remove('pressed'),110);combo.push({label,type:'attack'});render();say(label==='LP+LK+RK'?'挑発を追加':`${label}を追加`)};grid.append(button)})}
 function updateCharacterStateTags(){const character=$('#character').value,group=controls.children[7],grid=group?.querySelector('.grid');if(!grid)return;const items=['相手ダウン中','ヒート中','壁やられ中',...(guardBreakCharacters.has(character)?['ガードブレイク']:[])];grid.innerHTML='';items.forEach(label=>{const button=document.createElement('button');button.className='cmd stateTag';button.textContent=label;button.setAttribute('aria-label',`${label}を追加`);button.onclick=()=>{button.classList.add('pressed');setTimeout(()=>button.classList.remove('pressed'),110);combo.push({label,type:'stateTag'});render();say(`${label}を追加`)};grid.append(button)})}
 function canEdit(item){return !['separator','stateTag'].includes(item.type)}
-function decorateItem(el,item,index){if(item.count>1){const count=document.createElement('b');count.className='count-badge';count.textContent=`×${item.count}`;el.append(count)}if(item.annotations?.length){const notes=document.createElement('span');notes.className='item-annotations';notes.textContent=item.annotations.join('・');el.append(notes)}if(item.footnote){const mark=document.createElement('sup');mark.className='footnote-mark';mark.textContent=`※${item.footnote}`;el.append(mark)}if(canEdit(item)){el.classList.add('editable-token');el.classList.toggle('selected-token',selectedIndex===index);el.setAttribute('role','button');el.setAttribute('tabindex','0');el.setAttribute('aria-label',`${item.label}を編集`);const choose=e=>{e.stopPropagation();selectedIndex=index;updateEditor();render()};el.onclick=choose;el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();choose(e)}}}}
+function decorateItem(el,item,index){if(item.count>1){const count=document.createElement('b');count.className='count-badge';count.textContent=`×${item.count}`;el.append(count)}if(item.annotations?.length){const notes=document.createElement('span');notes.className='item-annotations';notes.textContent=item.annotations.join('・');el.append(notes)}if(item.footnote){el.classList.add('has-footnote');const mark=document.createElement('sup');mark.className='footnote-mark';mark.textContent=`※${item.footnote}`;el.append(mark)}if(canEdit(item)){el.classList.add('editable-token');el.classList.toggle('selected-token',selectedIndex===index);el.setAttribute('role','button');el.setAttribute('tabindex','0');el.setAttribute('aria-label',`${item.label}を編集`);const choose=e=>{e.stopPropagation();selectedIndex=index;updateEditor();render()};el.onclick=choose;el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();choose(e)}}}}
 function draw(el,empty){el.innerHTML='';if(!combo.length){el.textContent=empty;return}combo.forEach((item,index)=>{let x=document.createElement('span');if(item.type==='separator'){x.className='sep';x.textContent='>'}else if(item.type==='stateTag'||item.type==='state'){x.className='state-tag';x.textContent=item.label}else if(item.type==='movement'&&(item.label==='前ステ'||item.label==='バクステ')){x.className='token movement-token';x.innerHTML=iconHtml(item.label,item.type)}else if(item.code||named[item.label]){x.className='named';x.innerHTML=`<span>${item.code||named[item.label][0]}</span><small>${item.caption||named[item.label][1]}</small>`}else{x.className=`token ${item.type}-token`;x.innerHTML=iconHtml(item.label,item.type,item.hold)}decorateItem(x,item,index);el.append(x)})}
 function recipeSnapshot(id,title){return{id,title,updatedAt:Date.now(),mode:currentMode,character:$('#character').value,damage:$('#damage').value,difficulty:$('#difficulty').value,notes:$('#notes').value,startTagId:selectedStartTag.id,stringConditionId:selectedStringCondition.id,combo:JSON.parse(JSON.stringify(combo))}}
 function storeRecipes(){try{localStorage.setItem(recipeStorageKey,JSON.stringify(savedRecipes))}catch(error){say('端末の保存領域を利用できませんでした')}}
@@ -116,28 +116,41 @@ function drawMemoCanvas(c,text,startX,startY,maxWidth,lineHeight,maxLines=2){let
 function drawComboIcons(c,startX,startY,maxX){
   const context=activeContextTag();
   canvasTag(c,360,116,context.label,context.color);
-  let x=startX,y=startY;
-  const next=w=>{if(x+w>maxX){x=startX;y+=78}const at=[x,y];x+=w;return at};
+  let x=startX,y=startY;const rowHeight=68;
   combo.forEach(item=>{
+    let baseWidth=0,code='',caption='';
+    if(item.type==='direction')baseWidth=58;
+    else if(item.type==='attack')baseWidth=64;
+    else if(item.type==='separator')baseWidth=42;
+    else if(item.type==='slide')baseWidth=48;
+    else if(item.type==='movement'&&(item.label==='前ステ'||item.label==='バクステ'))baseWidth=66;
+    else if(item.type==='stateTag'||item.type==='state'){c.font='800 17px "Yu Gothic",sans-serif';baseWidth=c.measureText(item.label).width+44}
+    else{code=item.code||named[item.label]?.[0]||item.label;caption=item.caption||named[item.label]?.[1]||'';c.font='900 29px "Yu Gothic",sans-serif';baseWidth=Math.max(105,Math.min(210,Math.max(c.measureText(code).width+26,caption.length*17)))}
+    const countWidth=item.count>1?54:0,annotationWidths=(item.annotations||[]).map(note=>{c.font='800 14px "Yu Gothic",sans-serif';return Math.min(180,c.measureText(note).width+24)+8}),groupWidth=baseWidth+countWidth+annotationWidths.reduce((sum,width)=>sum+width,0);
+    if(x+groupWidth>maxX&&x>startX){x=startX;y+=rowHeight}
+    const groupX=x,groupY=y;
+    if(item.footnote){c.fillStyle='rgba(40,118,136,.12)';c.beginPath();c.roundRect(groupX-6,groupY-3,groupWidth+12,62,12);c.fill();c.strokeStyle='#58bfd8';c.lineWidth=1.5;c.stroke()}
+    let tx=x,ty=y;
     if(item.type==='direction'){
-      const [tx,ty]=next(58);if(item.label==='☆'){c.fillStyle='#f5f7fa';c.font='400 44px "Yu Gothic",sans-serif';c.fillText('☆',tx,ty+42)}else canvasArrow(c,tx,ty+4,42,item.label,item.hold)
+      if(item.label==='☆'){c.fillStyle='#f5f7fa';c.font='400 44px "Yu Gothic",sans-serif';c.fillText('☆',tx,ty+42)}else canvasArrow(c,tx,ty+4,42,item.label,item.hold)
     }else if(item.type==='attack'){
-      const [tx,ty]=next(64);canvasAttack(c,tx+4,ty+2,item.label)
+      canvasAttack(c,tx+4,ty+2,item.label)
     }else if(item.type==='separator'){
-      const [tx,ty]=next(42);c.fillStyle='#e6333e';c.font='900 40px "Yu Gothic",sans-serif';c.fillText('›',tx+8,ty+40)
+      c.fillStyle='#e6333e';c.font='900 40px "Yu Gothic",sans-serif';c.fillText('›',tx+8,ty+40)
     }else if(item.type==='slide'){
-      const [tx,ty]=next(48);c.fillStyle='#f5f7fa';c.font='900 42px "Yu Gothic",sans-serif';c.fillText(item.label,tx+2,ty+42)
+      c.fillStyle='#f5f7fa';c.font='900 42px "Yu Gothic",sans-serif';c.fillText(item.label,tx+2,ty+42)
     }else if(item.type==='movement'&&(item.label==='前ステ'||item.label==='バクステ')){
-      const [tx,ty]=next(66),dir=item.label==='前ステ'?'6':'4';canvasArrow(c,tx,ty+9,34,dir,false);canvasArrow(c,tx+20,ty+9,34,dir,false)
+      const dir=item.label==='前ステ'?'6':'4';canvasArrow(c,tx,ty+9,34,dir,false);canvasArrow(c,tx+20,ty+9,34,dir,false)
     }else if(item.type==='stateTag'||item.type==='state'){
-      c.font='800 17px "Yu Gothic",sans-serif';const w=c.measureText(item.label).width+32,[tx,ty]=next(w+12);canvasTag(c,tx,ty+10,item.label,'#326f78')
+      canvasTag(c,tx,ty+10,item.label,'#326f78')
     }else{
-      const code=item.code||named[item.label]?.[0]||item.label,caption=item.caption||named[item.label]?.[1]||'',w=Math.max(105,Math.min(210,caption.length*17));const [tx,ty]=next(w);c.fillStyle='#f5f7fa';c.font='900 29px "Yu Gothic",sans-serif';c.textAlign='center';c.fillText(code,tx+w/2,ty+30);c.fillStyle='#b8c0cc';c.font='700 15px "Yu Gothic",sans-serif';c.fillText(caption,tx+w/2,ty+53);c.textAlign='left'
+      c.fillStyle='#f5f7fa';c.font='900 29px "Yu Gothic",sans-serif';c.textAlign='center';c.fillText(code,tx+baseWidth/2,ty+30);c.fillStyle='#b8c0cc';c.font='700 15px "Yu Gothic",sans-serif';c.fillText(caption,tx+baseWidth/2,ty+53);c.textAlign='left'
     }
-    if(item.count>1){const [tx,ty]=next(54);c.fillStyle='#f1b84b';c.font='900 23px "Yu Gothic",sans-serif';c.fillText(`×${item.count}`,tx+2,ty+35)}
-    const footnoteAnchorX=x;
-    (item.annotations||[]).forEach(note=>{c.font='800 14px "Yu Gothic",sans-serif';const w=Math.min(180,c.measureText(note).width+24),[tx,ty]=next(w+8);c.fillStyle='#543b18';c.beginPath();c.roundRect(tx,ty+14,w,27,7);c.fill();c.fillStyle='#ffd98a';c.textAlign='center';c.fillText(note,tx+w/2,ty+33);c.textAlign='left'})
-    if(item.footnote){c.font='900 13px "Yu Gothic",sans-serif';const mark=`※${item.footnote}`,mw=c.measureText(mark).width+14,mx=Math.max(startX,footnoteAnchorX-mw-5),my=y-27;c.fillStyle='#173d49';c.beginPath();c.roundRect(mx,my,mw,24,12);c.fill();c.strokeStyle='#58bfd8';c.lineWidth=1.5;c.stroke();c.fillStyle='#a8efff';c.textAlign='center';c.fillText(mark,mx+mw/2,my+16);c.textAlign='left'}
+    x+=baseWidth;
+    if(item.count>1){c.fillStyle='#f1b84b';c.font='900 23px "Yu Gothic",sans-serif';c.fillText(`×${item.count}`,x+2,y+35);x+=countWidth}
+    (item.annotations||[]).forEach((note,index)=>{const total=annotationWidths[index],w=total-8;c.fillStyle='#543b18';c.beginPath();c.roundRect(x,y+14,w,27,7);c.fill();c.fillStyle='#ffd98a';c.font='800 14px "Yu Gothic",sans-serif';c.textAlign='center';c.fillText(note,x+w/2,y+33);c.textAlign='left';x+=total})
+    if(item.footnote){c.font='900 13px "Yu Gothic",sans-serif';const mark=`※${item.footnote}`,mw=c.measureText(mark).width+14,mx=groupX+groupWidth-mw-3,my=groupY-24;c.fillStyle='#173d49';c.beginPath();c.roundRect(mx,my,mw,24,12);c.fill();c.strokeStyle='#58bfd8';c.lineWidth=1.5;c.stroke();c.fillStyle='#a8efff';c.textAlign='center';c.fillText(mark,mx+mw/2,my+16);c.textAlign='left'}
+    x+=4;
   });
   if(!combo.length){c.fillStyle='#9ca6b5';c.font='700 28px "Yu Gothic",sans-serif';c.fillText('コンボ未入力',startX,startY+36)}
 }
@@ -151,7 +164,7 @@ function savePngIcons(){
   c.fillStyle='#f5f7fa';c.font=`900 44px ${font}`;c.fillText($('#character').value.trim()||'CHARACTER',105,125);
   c.fillStyle='#9ca6b5';c.font=`700 17px ${font}`;c.fillText(stringMode?'STRING GUIDE':'COMBO GUIDE',105,155);
   if(!stringMode){c.textAlign='right';c.fillText('DAMAGE',1095,92);c.fillStyle='#f1b84b';c.font=`900 58px ${font}`;c.fillText($('#damage').value||'0',1095,148);c.textAlign='left'}
-  c.strokeStyle='#2d3540';c.beginPath();c.moveTo(105,184);c.lineTo(1100,184);c.stroke();drawComboIcons(c,105,205,1095);
+  c.strokeStyle='#2d3540';c.beginPath();c.moveTo(105,184);c.lineTo(1100,184);c.stroke();drawComboIcons(c,105,215,1095);
   c.beginPath();c.moveTo(105,420);c.lineTo(1100,420);c.stroke();c.fillStyle='#9ca6b5';c.font=`700 16px ${font}`;
   if(stringMode){c.fillText('連携メモ',105,462);drawMemoCanvas(c,$('#notes').value.trim()||'メモなし',105,500,990,30,2)}else{c.fillText('難易度',105,462);c.fillText('MEMO',340,462);c.fillStyle='#f5f7fa';c.font=`800 25px ${font}`;c.fillText($('#difficulty').value,105,503);drawMemoCanvas(c,$('#notes').value.trim()||'メモなし',340,500,755,30,2)}
   c.fillStyle=accent;c.font=`900 18px ${font}`;c.fillText('TEKKEN 8 COMBO CARD MAKER / CCM',105,555);
