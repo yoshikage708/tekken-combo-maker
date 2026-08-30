@@ -135,7 +135,7 @@ function drawComboIcons(c,startX,startY,maxX){
     if(item.count>1){const [tx,ty]=next(54);c.fillStyle='#f1b84b';c.font='900 23px "Yu Gothic",sans-serif';c.fillText(`×${item.count}`,tx+2,ty+35)}
     const footnoteAnchorX=x;
     (item.annotations||[]).forEach(note=>{c.font='800 14px "Yu Gothic",sans-serif';const w=Math.min(180,c.measureText(note).width+24),[tx,ty]=next(w+8);c.fillStyle='#543b18';c.beginPath();c.roundRect(tx,ty+14,w,27,7);c.fill();c.fillStyle='#ffd98a';c.textAlign='center';c.fillText(note,tx+w/2,ty+33);c.textAlign='left'})
-    if(item.footnote){c.font='900 13px "Yu Gothic",sans-serif';const mark=`※${item.footnote}`,mw=c.measureText(mark).width+14,mx=Math.max(startX,footnoteAnchorX-mw-5);c.fillStyle='#173d49';c.beginPath();c.roundRect(mx,y+1,mw,24,12);c.fill();c.strokeStyle='#58bfd8';c.lineWidth=1.5;c.stroke();c.fillStyle='#a8efff';c.textAlign='center';c.fillText(mark,mx+mw/2,y+17);c.textAlign='left'}
+    if(item.footnote){c.font='900 13px "Yu Gothic",sans-serif';const mark=`※${item.footnote}`,mw=c.measureText(mark).width+14,mx=Math.max(startX,footnoteAnchorX-mw-5),my=y-12;c.fillStyle='#173d49';c.beginPath();c.roundRect(mx,my,mw,24,12);c.fill();c.strokeStyle='#58bfd8';c.lineWidth=1.5;c.stroke();c.fillStyle='#a8efff';c.textAlign='center';c.fillText(mark,mx+mw/2,my+16);c.textAlign='left'}
   });
   if(!combo.length){c.fillStyle='#9ca6b5';c.font='700 28px "Yu Gothic",sans-serif';c.fillText('コンボ未入力',startX,startY+36)}
 }
