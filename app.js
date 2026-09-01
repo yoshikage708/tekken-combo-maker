@@ -24,4 +24,4 @@ $('#save').onclick=savePngForDevice;
 $('#comboMode').onclick=()=>{currentMode='combo';renderMode();say('コンボモードに切り替えました')};
 $('#stringMode').onclick=()=>{currentMode='string';renderMode();say('連携モードに切り替えました')};
 renderMode();
-document.body.dataset.directionDisplay=directionDisplay;document.querySelectorAll('[data-direction-display]').forEach(button=>{button.classList.toggle('active',button.dataset.directionDisplay===directionDisplay);button.setAttribute('aria-pressed',String(button.dataset.directionDisplay===directionDisplay));button.onclick=()=>setDirectionDisplay(button.dataset.directionDisplay)});refreshDirectionDisplays();render();renderMemo();
+document.body.dataset.directionDisplay=directionDisplay;document.querySelectorAll('[data-direction-display]').forEach(button=>{button.classList.toggle('active',button.dataset.directionDisplay===directionDisplay);button.setAttribute('aria-pressed',String(button.dataset.directionDisplay===directionDisplay));button.onclick=()=>setDirectionDisplay(button.dataset.directionDisplay)});updateDirectionModeLabels();refreshDirectionDisplays();render();renderMemo();
