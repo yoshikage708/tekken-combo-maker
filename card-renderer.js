@@ -8,7 +8,7 @@ function drawComboIcons(c,startX,startY,maxX){
   let x=startX,y=startY;const rowHeight=70,rangeSegments=new Map;
   combo.forEach(item=>{
     let baseWidth=0,code='',caption='';
-    if(item.type==='direction')baseWidth=directionDisplay==='numpad'?36:58;
+    if(item.type==='direction')baseWidth=directionDisplay==='numpad'?22:58;
     else if(item.type==='attack')baseWidth=64;
     else if(item.type==='separator')baseWidth=42;
     else if(item.type==='slide')baseWidth=48;
@@ -21,7 +21,7 @@ function drawComboIcons(c,startX,startY,maxX){
     if(item.footnote&&!item.footnoteGroup){c.fillStyle='rgba(40,118,136,.12)';c.beginPath();c.roundRect(groupX-6,groupY-3,groupWidth+12,62,12);c.fill();c.strokeStyle='#58bfd8';c.lineWidth=1.5;c.stroke()}
     let tx=x,ty=y;
     if(item.type==='direction'){
-      if(directionDisplay==='numpad')canvasNumpad(c,tx-3,ty+4,36,item.label,item.hold)
+      if(directionDisplay==='numpad')canvasNumpad(c,tx-7,ty+4,32,item.label,item.hold)
       else if(item.label==='☆'){c.fillStyle='#f5f7fa';c.font='400 44px "Yu Gothic",sans-serif';c.fillText('☆',tx,ty+42)}else canvasArrow(c,tx,ty+4,42,item.label,item.hold)
     }else if(item.type==='attack'){
       canvasAttack(c,tx+4,ty+2,item.label)
