@@ -6,10 +6,10 @@ function canvasTag(c,x,y,label,color){c.font='800 18px "Yu Gothic",sans-serif';c
 function drawMemoCanvas(c,text,startX,startY,maxWidth,lineHeight,maxLines=2){let x=startX,y=startY,line=0;c.font='500 21px "Yu Gothic",sans-serif';const newline=()=>{x=startX;y+=lineHeight;line++};for(const part of memoParts(text||'')){if(line>=maxLines)break;if(part.type==='text'){for(const ch of [...part.text]){if(ch==='\n'){newline();continue}const w=c.measureText(ch).width;if(x+w>startX+maxWidth)newline();if(line>=maxLines)break;c.fillStyle='#f5f7fa';c.fillText(ch,x,y);x+=w}}else{const w=part.type==='footnote'?38:part.type==='direction'?29:30;if(x+w>startX+maxWidth)newline();if(line>=maxLines)break;if(part.type==='footnote'){c.fillStyle='#173d49';c.beginPath();c.roundRect(x-2,y-21,w,24,12);c.fill();c.strokeStyle='#58bfd8';c.lineWidth=1.2;c.stroke();c.fillStyle='#a8efff';c.font='900 12px "Yu Gothic",sans-serif';c.textAlign='center';c.fillText(`※${part.label}`,x-2+w/2,y-5);c.textAlign='left'}else{if(!(part.type==='direction'&&directionDisplay==='numpad')){c.fillStyle='#151b22';c.beginPath();c.roundRect(x-2,y-22,w,27,5);c.fill()}if(part.type==='direction'){if(directionDisplay==='numpad')canvasNumpad(c,x+2,y-20,20,part.label,false);else if(part.label==='☆'){c.fillStyle='#f5f7fa';c.font='20px "Yu Gothic",sans-serif';c.fillText('☆',x+3,y-2)}else canvasArrow(c,x+2,y-20,20,part.label,false)}else canvasAttackMini(c,x+5,y-19,part.label)}x+=w+4;c.font='500 21px "Yu Gothic",sans-serif'}}}
 function drawComboIcons(c,startX,startY,maxX){
   let x=startX,y=startY;const rowHeight=70,rangeSegments=new Map;
-  combo.forEach(item=>{
+  combo.forEach((item,index)=>{
     let baseWidth=0,code='',caption='';
     if(item.type==='direction')baseWidth=directionDisplay==='numpad'?22:58;
-    else if(item.type==='attack')baseWidth=64;
+    else if(item.type==='attack')baseWidth=directionDisplay==='numpad'&&combo[index+1]?.type==='direction'?48:64;
     else if(item.type==='separator')baseWidth=42;
     else if(item.type==='slide')baseWidth=48;
     else if(item.type==='movement'&&(item.label==='前ステ'||item.label==='バクステ'))baseWidth=78;
