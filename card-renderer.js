@@ -1,5 +1,5 @@
 function canvasArrow(c,x,y,size,dir,filled,masked=false){const angles={'6':0,'3':45,'2':90,'1':135,'4':180,'7':225,'8':270,'9':315};c.save();c.translate(x+size/2,y+size/2);c.rotate((angles[dir]||0)*Math.PI/180);c.beginPath();c.moveTo(-size*.42,-size*.15);c.lineTo(size*.08,-size*.15);c.lineTo(size*.08,-size*.34);c.lineTo(size*.43,0);c.lineTo(size*.08,size*.34);c.lineTo(size*.08,size*.15);c.lineTo(-size*.42,size*.15);c.closePath();if(filled){c.fillStyle='#f5f7fa';c.fill()}else{if(masked){c.fillStyle='#171d24';c.fill()}c.strokeStyle='#f5f7fa';c.lineWidth=2;c.stroke()}c.restore()}
-function canvasNumpad(c,x,y,size,label,held=false){c.fillStyle=held?'#f1b84b':'#f5f7fa';c.font=`900 ${Math.round(size*.7)}px Inter,"Yu Gothic",sans-serif`;c.textAlign='center';c.textBaseline='middle';c.fillText(label,x+size/2,y+size/2+2);c.textAlign='left';c.textBaseline='alphabetic'}
+function canvasNumpad(c,x,y,size,label,held=false){c.fillStyle=held?'#f1b84b':'#f5f7fa';c.font=`800 ${Math.round(size*.62)}px Arial,"Yu Gothic",sans-serif`;c.textAlign='center';c.textBaseline='middle';c.fillText(label,x+size/2,y+size/2+2);c.textAlign='left';c.textBaseline='alphabetic'}
 function canvasAttack(c,x,y,label){const dots=attackDots[label]||[0,0,0,0],r=8,gap=20;dots.forEach((on,i)=>{const cx=x+(i%2)*gap+r,cy=y+Math.floor(i/2)*gap+r;c.beginPath();c.arc(cx,cy,r,0,Math.PI*2);c.fillStyle=on?'#f5f7fa':'#171d24';c.fill();c.strokeStyle='#f5f7fa';c.lineWidth=1.8;c.stroke()});c.fillStyle='#b8c0cc';c.font=`800 ${label.length>6?10:14}px "Yu Gothic",sans-serif`;c.textAlign='center';c.fillText(label,x+18,y+50);c.textAlign='left'}
 function canvasAttackMini(c,x,y,label){const dots=attackDots[label]||[0,0,0,0],r=3.5,gap=9;dots.forEach((on,i)=>{c.beginPath();c.arc(x+(i%2)*gap+r,y+Math.floor(i/2)*gap+r,r,0,Math.PI*2);c.fillStyle=on?'#f5f7fa':'#171d24';c.fill();c.strokeStyle='#f5f7fa';c.lineWidth=1;c.stroke()});c.fillStyle='#c6ced8';c.font='800 8px "Yu Gothic",sans-serif';c.textAlign='center';c.fillText(label,x+8,y+22);c.textAlign='left'}
 function canvasTag(c,x,y,label,color){c.font='800 18px "Yu Gothic",sans-serif';const w=c.measureText(label).width+34;c.fillStyle=color;c.beginPath();c.roundRect(x,y,w,34,17);c.fill();c.fillStyle='#fff';c.textAlign='center';c.fillText(label,x+w/2,y+23);c.textAlign='left';return w}
@@ -8,7 +8,7 @@ function drawComboIcons(c,startX,startY,maxX){
   let x=startX,y=startY;const rowHeight=70,rangeSegments=new Map;
   combo.forEach(item=>{
     let baseWidth=0,code='',caption='';
-    if(item.type==='direction')baseWidth=58;
+    if(item.type==='direction')baseWidth=directionDisplay==='numpad'?36:58;
     else if(item.type==='attack')baseWidth=64;
     else if(item.type==='separator')baseWidth=42;
     else if(item.type==='slide')baseWidth=48;
@@ -21,7 +21,7 @@ function drawComboIcons(c,startX,startY,maxX){
     if(item.footnote&&!item.footnoteGroup){c.fillStyle='rgba(40,118,136,.12)';c.beginPath();c.roundRect(groupX-6,groupY-3,groupWidth+12,62,12);c.fill();c.strokeStyle='#58bfd8';c.lineWidth=1.5;c.stroke()}
     let tx=x,ty=y;
     if(item.type==='direction'){
-      if(directionDisplay==='numpad')canvasNumpad(c,tx,ty+4,42,item.label,item.hold)
+      if(directionDisplay==='numpad')canvasNumpad(c,tx-3,ty+4,36,item.label,item.hold)
       else if(item.label==='☆'){c.fillStyle='#f5f7fa';c.font='400 44px "Yu Gothic",sans-serif';c.fillText('☆',tx,ty+42)}else canvasArrow(c,tx,ty+4,42,item.label,item.hold)
     }else if(item.type==='attack'){
       canvasAttack(c,tx+4,ty+2,item.label)
