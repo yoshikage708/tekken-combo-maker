@@ -7,21 +7,23 @@ function drawMemoCanvas(c,text,startX,startY,maxWidth,lineHeight,maxLines=2){let
 function numpadCanvasFont(c,atom){const neutral=atom.item.type==='direction'&&atom.item.label==='☆',size=Math.round(numpadLayoutConfig.pngFontSize*(neutral?numpadLayoutConfig.neutralScale:1));c.font=`${numpadLayoutConfig.fontWeight} ${size}px ${numpadLayoutConfig.fontFamily}`}
 function measureNumpadCanvasAtom(c,atom){const item=atom.item,annotations=item.annotations||[];let baseWidth=0,code='',caption='';if(atom.kind!=='rich'){numpadCanvasFont(c,atom);baseWidth=c.measureText(atom.text).width}else if(item.type==='stateTag'||item.type==='state'){c.font='800 17px "Yu Gothic",sans-serif';baseWidth=c.measureText(item.label).width+44}else{code=item.code||named[item.label]?.[0]||item.label;caption=item.caption||named[item.label]?.[1]||'';c.font='900 29px "Yu Gothic",sans-serif';baseWidth=Math.max(105,Math.min(210,Math.max(c.measureText(code).width+26,caption.length*17)))}const countWidth=item.count>1?50:0,annotationWidths=annotations.map(note=>{c.font='800 14px "Yu Gothic",sans-serif';return Math.min(180,c.measureText(note).width+24)+8});return{baseWidth,countWidth,annotationWidths,groupWidth:baseWidth+countWidth+annotationWidths.reduce((sum,width)=>sum+width,0),code,caption}}
 function drawNumpadComboIcons(c,startX,startY,maxX){let x=startX,y=startY;const rowHeight=numpadLayoutConfig.lineHeight,rangeSegments=new Map,layout=buildNumpadLayout(combo);const newline=()=>{x=startX;y+=rowHeight};const drawAtom=(atom,metrics)=>{const item=atom.item,groupX=x,groupY=y,groupWidth=metrics.groupWidth;if(item.footnote&&!item.footnoteGroup){c.fillStyle='rgba(40,118,136,.12)';c.beginPath();c.roundRect(groupX-4,groupY-3,groupWidth+8,62,9);c.fill();c.strokeStyle='#58bfd8';c.lineWidth=1.5;c.stroke()}if(atom.kind!=='rich'){numpadCanvasFont(c,atom);c.fillStyle=atom.kind==='direction'?(item.hold?numpadLayoutConfig.holdColor:numpadLayoutConfig.tapColor):atom.kind==='separator'?numpadLayoutConfig.separatorColor:numpadLayoutConfig.attackColor;c.textAlign='left';c.textBaseline='alphabetic';c.fillText(atom.text,x,y+40)}else if(item.type==='stateTag'||item.type==='state')canvasTag(c,x,y+10,item.label,'#326f78');else{c.fillStyle='#f5f7fa';c.font='900 29px "Yu Gothic",sans-serif';c.textAlign='center';c.fillText(metrics.code,x+metrics.baseWidth/2,y+30);c.fillStyle='#b8c0cc';c.font='700 15px "Yu Gothic",sans-serif';c.fillText(metrics.caption,x+metrics.baseWidth/2,y+53);c.textAlign='left'}x+=metrics.baseWidth;if(item.count>1){c.fillStyle='#f1b84b';c.font='900 23px "Yu Gothic",sans-serif';c.fillText(`×${item.count}`,x+2,y+35);x+=metrics.countWidth}(item.annotations||[]).forEach((note,index)=>{const total=metrics.annotationWidths[index],w=total-8;c.fillStyle='#543b18';c.beginPath();c.roundRect(x,y+14,w,27,7);c.fill();c.fillStyle='#ffd98a';c.font='800 14px "Yu Gothic",sans-serif';c.textAlign='center';c.fillText(note,x+w/2,y+33);c.textAlign='left';x+=total});if(item.footnote&&!item.footnoteGroup){c.font='900 13px "Yu Gothic",sans-serif';const mark=`※${item.footnote}`,mw=c.measureText(mark).width+14,mx=groupX+1,my=groupY-15;c.fillStyle='#173d49';c.beginPath();c.roundRect(mx,my,mw,24,12);c.fill();c.strokeStyle='#58bfd8';c.lineWidth=1.5;c.stroke();c.fillStyle='#a8efff';c.textAlign='center';c.fillText(mark,mx+mw/2,my+16);c.textAlign='left'}if(item.footnoteGroup){if(!rangeSegments.has(item.footnoteGroup))rangeSegments.set(item.footnoteGroup,{number:item.footnote,rows:new Map});const group=rangeSegments.get(item.footnoteGroup),row=group.rows.get(groupY);if(row){row.left=Math.min(row.left,groupX);row.right=Math.max(row.right,groupX+groupWidth)}else group.rows.set(groupY,{left:groupX,right:groupX+groupWidth,top:groupY})}};layout.forEach(segment=>{const entries=segment.atoms.map(atom=>({atom,metrics:measureNumpadCanvasAtom(c,atom)})),segmentWidth=entries.reduce((sum,entry)=>sum+entry.metrics.groupWidth,0);if(segmentWidth<=maxX-startX){if(x+segmentWidth>maxX&&x>startX)newline();entries.forEach(entry=>drawAtom(entry.atom,entry.metrics))}else entries.forEach(entry=>{if(x+entry.metrics.groupWidth>maxX&&x>startX)newline();drawAtom(entry.atom,entry.metrics)})});rangeSegments.forEach(group=>{[...group.rows.values()].sort((a,b)=>a.top-b.top).forEach((row,index)=>{c.fillStyle='rgba(40,118,136,.12)';c.beginPath();c.roundRect(row.left-4,row.top-3,row.right-row.left+8,62,9);c.fill();c.strokeStyle='#58bfd8';c.lineWidth=1.5;c.stroke();if(index===0){c.font='900 13px "Yu Gothic",sans-serif';const mark=`※${group.number}`,mw=c.measureText(mark).width+14,mx=row.left-3,my=row.top-15;c.fillStyle='#173d49';c.beginPath();c.roundRect(mx,my,mw,24,12);c.fill();c.strokeStyle='#58bfd8';c.stroke();c.fillStyle='#a8efff';c.textAlign='center';c.fillText(mark,mx+mw/2,my+16);c.textAlign='left'}})});if(!combo.length){c.fillStyle='#9ca6b5';c.font='700 28px "Yu Gothic",sans-serif';c.fillText('コンボ未入力',startX,startY+36)}return y+62}
+function measureArrowCanvasAtom(c,atom){
+  const item=atom.item;let baseWidth=0,code='',caption='';
+  if(item.type==='direction')baseWidth=58;
+  else if(item.type==='attack')baseWidth=64;
+  else if(item.type==='separator')baseWidth=42;
+  else if(item.type==='slide')baseWidth=48;
+  else if(item.type==='movement'&&(item.label==='前ステ'||item.label==='バクステ'))baseWidth=78;
+  else if(item.type==='stateTag'||item.type==='state'){c.font='800 17px "Yu Gothic",sans-serif';baseWidth=c.measureText(item.label).width+44}
+  else{code=item.code||named[item.label]?.[0]||item.label;caption=item.caption||named[item.label]?.[1]||'';c.font='900 29px "Yu Gothic",sans-serif';baseWidth=Math.max(105,Math.min(210,Math.max(c.measureText(code).width+26,caption.length*17)))}
+  const countWidth=item.count>1?54:0,annotationWidths=(item.annotations||[]).map(note=>{c.font='800 14px "Yu Gothic",sans-serif';return Math.min(180,c.measureText(note).width+24)+8});
+  return{baseWidth,countWidth,annotationWidths,groupWidth:baseWidth+countWidth+annotationWidths.reduce((sum,width)=>sum+width,0)+4,code,caption}
+}
 function drawComboIcons(c,startX,startY,maxX){
   if(directionDisplay==='numpad')return drawNumpadComboIcons(c,startX,startY,maxX);
-  let x=startX,y=startY;const rowHeight=70,rangeSegments=new Map;
-  combo.forEach((item,index)=>{
-    let baseWidth=0,code='',caption='';
-    if(item.type==='direction')baseWidth=directionDisplay==='numpad'?22:58;
-    else if(item.type==='attack')baseWidth=directionDisplay==='numpad'&&combo[index+1]?.type==='direction'?48:64;
-    else if(item.type==='separator')baseWidth=42;
-    else if(item.type==='slide')baseWidth=48;
-    else if(item.type==='movement'&&(item.label==='前ステ'||item.label==='バクステ'))baseWidth=78;
-    else if(item.type==='stateTag'||item.type==='state'){c.font='800 17px "Yu Gothic",sans-serif';baseWidth=c.measureText(item.label).width+44}
-    else{code=item.code||named[item.label]?.[0]||item.label;caption=item.caption||named[item.label]?.[1]||'';c.font='900 29px "Yu Gothic",sans-serif';baseWidth=Math.max(105,Math.min(210,Math.max(c.measureText(code).width+26,caption.length*17)))}
-    const countWidth=item.count>1?54:0,annotationWidths=(item.annotations||[]).map(note=>{c.font='800 14px "Yu Gothic",sans-serif';return Math.min(180,c.measureText(note).width+24)+8}),groupWidth=baseWidth+countWidth+annotationWidths.reduce((sum,width)=>sum+width,0);
-    if(x+groupWidth>maxX&&x>startX){x=startX;y+=rowHeight}
-    const groupX=x,groupY=y;
+  let x=startX,y=startY;const rowHeight=70,rangeSegments=new Map,layout=buildCommandLayout(combo),newline=()=>{x=startX;y+=rowHeight};
+  const drawAtom=(atom,metrics)=>{
+    const item=atom.item,{baseWidth,countWidth,annotationWidths,groupWidth,code,caption}=metrics,groupX=x,groupY=y;
     if(item.footnote&&!item.footnoteGroup){c.fillStyle='rgba(40,118,136,.12)';c.beginPath();c.roundRect(groupX-6,groupY-3,groupWidth+12,62,12);c.fill();c.strokeStyle='#58bfd8';c.lineWidth=1.5;c.stroke()}
     let tx=x,ty=y;
     if(item.type==='direction'){
@@ -46,6 +48,16 @@ function drawComboIcons(c,startX,startY,maxX){
     if(item.footnote&&!item.footnoteGroup){c.font='900 13px "Yu Gothic",sans-serif';const mark=`※${item.footnote}`,mw=c.measureText(mark).width+14,mx=groupX+3,my=groupY-15;c.fillStyle='#173d49';c.beginPath();c.roundRect(mx,my,mw,24,12);c.fill();c.strokeStyle='#58bfd8';c.lineWidth=1.5;c.stroke();c.fillStyle='#a8efff';c.textAlign='center';c.fillText(mark,mx+mw/2,my+16);c.textAlign='left'}
     if(item.footnoteGroup){if(!rangeSegments.has(item.footnoteGroup))rangeSegments.set(item.footnoteGroup,{number:item.footnote,rows:new Map});const group=rangeSegments.get(item.footnoteGroup),row=group.rows.get(groupY);if(row){row.left=Math.min(row.left,groupX);row.right=Math.max(row.right,groupX+groupWidth)}else group.rows.set(groupY,{left:groupX,right:groupX+groupWidth,top:groupY})}
     x+=4;
+  };
+  layout.forEach(segment=>{
+    const entries=segment.atoms.map(atom=>({atom,metrics:measureArrowCanvasAtom(c,atom)})),segmentWidth=entries.reduce((sum,entry)=>sum+entry.metrics.groupWidth,0);
+    if(segmentWidth<=maxX-startX){
+      if(x+segmentWidth>maxX&&x>startX)newline();
+      entries.forEach(entry=>drawAtom(entry.atom,entry.metrics));
+    }else entries.forEach(entry=>{
+      if(x+entry.metrics.groupWidth>maxX&&x>startX)newline();
+      drawAtom(entry.atom,entry.metrics);
+    });
   });
   rangeSegments.forEach(group=>{[...group.rows.values()].sort((a,b)=>a.top-b.top).forEach((row,index)=>{c.fillStyle='rgba(40,118,136,.12)';c.beginPath();c.roundRect(row.left-6,row.top-3,row.right-row.left+12,62,12);c.fill();c.strokeStyle='#58bfd8';c.lineWidth=1.5;c.stroke();if(index===0){c.font='900 13px "Yu Gothic",sans-serif';const mark=`※${group.number}`,mw=c.measureText(mark).width+14,mx=row.left-3,my=row.top-15;c.fillStyle='#173d49';c.beginPath();c.roundRect(mx,my,mw,24,12);c.fill();c.strokeStyle='#58bfd8';c.stroke();c.fillStyle='#a8efff';c.textAlign='center';c.fillText(mark,mx+mw/2,my+16);c.textAlign='left'}})});
   if(!combo.length){c.fillStyle='#9ca6b5';c.font='700 28px "Yu Gothic",sans-serif';c.fillText('コンボ未入力',startX,startY+36)}
