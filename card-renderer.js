@@ -63,6 +63,12 @@ function drawComboIcons(c,startX,startY,maxX){
   if(!combo.length){c.fillStyle='#9ca6b5';c.font='700 28px "Yu Gothic",sans-serif';c.fillText('コンボ未入力',startX,startY+36)}
   return y+62;
 }
+function renderComboLayerForCard(){
+  const targetWidth=1020,availableHeight=215,edgeReserve=15,render=width=>{const layer=document.createElement('canvas');layer.width=Math.ceil(width);layer.height=1400;const context=layer.getContext('2d'),bottom=drawComboIcons(context,10,20,layer.width-edgeReserve),contentHeight=Math.max(82,bottom+10);return{layer,contentHeight,width:layer.width}};
+  let result=render(targetWidth),scale=Math.min(1,availableHeight/result.contentHeight);
+  if(scale<1)result=render(targetWidth/scale);
+  return{...result,scale};
+}
 function savePngIcons(){
   const canvas=document.createElement('canvas');canvas.width=1200;canvas.height=630;
   const c=canvas.getContext('2d'),font='"Noto Sans JP","Yu Gothic",sans-serif',stringMode=currentMode==='string';
@@ -75,7 +81,7 @@ function savePngIcons(){
   if(!stringMode){c.textAlign='right';c.fillText('DAMAGE',1095,92);c.fillStyle='#f1b84b';c.font=`900 58px ${font}`;c.fillText($('#damage').value||'0',1095,148);c.textAlign='left'}
   const context=activeContextTag();canvasTag(c,360,116,context.label,context.color);
   c.strokeStyle='#2d3540';c.beginPath();c.moveTo(105,184);c.lineTo(1100,184);c.stroke();
-  const comboLayer=document.createElement('canvas');comboLayer.width=1020;comboLayer.height=620;const lc=comboLayer.getContext('2d'),comboBottom=drawComboIcons(lc,10,20,1005),contentHeight=Math.max(82,comboBottom+10),availableHeight=215,comboScale=Math.min(1,availableHeight/contentHeight);c.drawImage(comboLayer,0,0,1020,contentHeight,105,195,1020*comboScale,contentHeight*comboScale);
+  const comboRender=renderComboLayerForCard(),comboLayer=comboRender.layer,contentHeight=comboRender.contentHeight,comboScale=comboRender.scale;c.drawImage(comboLayer,0,0,comboRender.width,contentHeight,105,195,comboRender.width*comboScale,contentHeight*comboScale);
   c.beginPath();c.moveTo(105,420);c.lineTo(1100,420);c.stroke();c.fillStyle='#9ca6b5';c.font=`700 16px ${font}`;
   if(stringMode){c.fillText('連携メモ',105,462);drawMemoCanvas(c,$('#notes').value.trim()||'メモなし',105,500,990,30,2)}else{c.fillText('難易度',105,462);c.fillText('MEMO',340,462);c.fillStyle='#f5f7fa';c.font=`800 25px ${font}`;c.fillText($('#difficulty').value,105,503);drawMemoCanvas(c,$('#notes').value.trim()||'メモなし',340,500,755,30,2)}
   c.fillStyle=accent;c.font=`900 18px ${font}`;c.fillText('TEKKEN 8 COMBO CARD MAKER / CCM',105,555);
