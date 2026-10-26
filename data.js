@@ -1,4 +1,8 @@
 const startTagOptions=[{id:'normal',label:'通常ヒット',color:'#58708f'},{id:'counter',label:'カウンターヒット',color:'#d94a55'},{id:'heat-dash',label:'ヒートダッシュ',color:'#b14ed0'},{id:'wall',label:'壁コンボ',color:'#d27a32'},{id:'low-parry',label:'下段捌き',color:'#3f9b78'},{id:'ground',label:'地上コンボ',color:'#6d65c7'}];
+const hitConditionOptions=startTagOptions.slice(0,2);
+const comboTypeOptions=[{id:'normal-combo',label:'通常コンボ',color:'#58708f'},...startTagOptions.slice(2)];
+function startSelectionFromLegacy(startTagId){if(startTagId==='counter')return{hitConditionId:'counter',comboTypeId:'normal-combo'};if(['heat-dash','wall','low-parry','ground'].includes(startTagId))return{hitConditionId:'normal',comboTypeId:startTagId};return{hitConditionId:'normal',comboTypeId:'normal-combo'}}
+function legacyStartTagId(hitConditionId,comboTypeId){return comboTypeId==='normal-combo'?(hitConditionId==='counter'?'counter':'normal'):comboTypeId}
 const stringConditionOptions=[{id:'after-guard',label:'ガード後',color:'#247584'},{id:'after-hit',label:'ヒット後',color:'#347c65'},{id:'after-counter',label:'カウンターヒット後',color:'#8b4b72'}];
 const characterConditions={
   '仁':[['前心','前心']],
