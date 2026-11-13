@@ -31,3 +31,18 @@
 
 /* コマンドの見た目は保ち、各要素が実際に必要とする幅だけを使う */
 .combo{column-gap:1px}.arrow-command-segment{gap:1px}.direction-token{margin-inline:0}.attack-token{margin-inline:.05em}.movement-token{min-width:58px;margin-inline:.06em;padding-inline:0}.sep{margin-inline:.16em}.named{margin-inline:.08em}.card-combo .named{margin-inline:.08em}.card-combo .direction-token{margin-inline:0}.card-combo .attack-token{margin-inline:.05em}.card-combo .movement-token{margin-inline:.06em}.card-combo .sep{margin-inline:.16em}@media(max-width:520px){.live .named{margin-inline:.04em}.live .movement-token{min-width:43px;margin-inline:.03em}.live .sep{margin-inline:.12em}}
+
+/* 入力確認は編集ボタン分だけ横幅が狭い。各入力を縮ませず、必要幅で安全に折り返す */
+.live #live .command-segment{flex:0 0 auto;width:max-content;max-width:100%;min-width:0;align-content:center}
+.live #live .command-segment>*{flex-shrink:0}
+.live #live .named{width:max-content;max-width:100%;white-space:nowrap}
+.live #live .named small{max-width:none;white-space:nowrap}
+.live #live .direction-token,.live #live .attack-token,.live #live .movement-token,.live #live .state-tag{flex:0 0 auto}
+.live-command-tail{display:inline-flex;flex:0 0 auto;align-items:center;gap:1px;white-space:nowrap}
+@media(max-width:520px){
+ .live #live .arrow-command-segment{gap:2px;row-gap:9px}
+ .live #live .numpad-command-segment{gap:0;row-gap:7px}
+ .live #live .named{min-height:30px;margin-inline:.08em}
+ .live #live .named small{font-size:7px!important}
+ .live #live .movement-token{min-width:45px}
+}
