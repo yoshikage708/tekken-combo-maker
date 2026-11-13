@@ -39,6 +39,8 @@
 .live #live .named small{max-width:none;white-space:nowrap}
 .live #live .direction-token,.live #live .attack-token,.live #live .movement-token,.live #live .state-tag{flex:0 0 auto}
 .live-command-tail{display:inline-flex;flex:0 0 auto;align-items:center;gap:1px;white-space:nowrap}
+.live-command-tail>*{flex:0 0 auto}
+.live-command-tail .named{width:max-content;min-width:max-content;white-space:nowrap}
 @media(max-width:520px){
  .live #live .arrow-command-segment{gap:2px;row-gap:9px}
  .live #live .numpad-command-segment{gap:0;row-gap:7px}
@@ -49,7 +51,7 @@
 
 /* スマホでは入力確認と操作ボタンを上下に分け、通常の文書フローで高さを確保する */
 @media(max-width:520px){
- .live.sticky{position:relative;top:auto;z-index:auto}
+ .live.sticky{position:sticky;top:max(4px,env(safe-area-inset-top));z-index:20;max-height:calc(100dvh - max(8px,env(safe-area-inset-top)));overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
  .live{display:flex;width:100%;max-width:100%;min-width:0;flex-direction:column;align-items:stretch;gap:10px;background:#11151b}
  .live>div:first-child{width:100%;min-width:0;flex:none}
  .live #live{width:100%;max-width:100%;min-width:0;max-height:none;overflow:visible;padding:7px 3px 9px}
@@ -58,4 +60,9 @@
  .live-actions>#deleteSelected{grid-column:1/-1}
  .live-actions-secondary{grid-column:1/-1;width:100%;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
  .live-actions-secondary button{min-width:0}
+ .live #live .arrow-command-segment{column-gap:6px}
+ .live #live .named{width:max-content;min-width:max-content;flex-basis:max-content;margin-inline:.12em}
+ .live #live .named small{display:block;width:max-content;min-width:max-content}
+ .live #live .attack-token,.live #live .direction-token{min-width:max-content}
+ .live #live .sep{margin-inline:.16em}
 }
