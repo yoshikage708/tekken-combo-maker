@@ -41,6 +41,7 @@
 .live-command-tail{display:inline-flex;flex:0 0 auto;align-items:center;gap:1px;white-space:nowrap}
 .live-command-tail>*{flex:0 0 auto}
 .live-command-tail .named{width:max-content;min-width:max-content;white-space:nowrap}
+.arrow-command-segment .direction-token.adjacent-direction{margin-left:-1px}
 @media(max-width:520px){
  .live #live .arrow-command-segment{gap:2px;row-gap:9px}
  .live #live .numpad-command-segment{gap:0;row-gap:7px}
@@ -65,4 +66,5 @@
  .live #live .named small{display:block;width:max-content;min-width:max-content}
  .live #live .attack-token,.live #live .direction-token{min-width:max-content}
  .live #live .sep{margin-inline:.16em}
+ .live #live .direction-token.adjacent-direction{margin-left:-4px}
 }

@@ -21,10 +21,12 @@ function measureArrowCanvasAtom(c,atom){
   const countWidth=item.count>1?54:0,annotationWidths=(item.annotations||[]).map(note=>{c.font='800 14px "Yu Gothic",sans-serif';return Math.min(180,c.measureText(note).width+24)+8}),chWidth=counterHitDisplayEnabled()&&(item.counterHitPart||item.counterHit)?counterHitCanvasWidth(c,item):0;
   return{baseWidth,countWidth,annotationWidths,chWidth,groupWidth:baseWidth+countWidth+annotationWidths.reduce((sum,width)=>sum+width,0)+chWidth+2,code,caption}
 }
+function measureArrowCanvasEntries(c,atoms){return atoms.map((atom,index)=>{const metrics=measureArrowCanvasAtom(c,atom),leadingOverlap=index>0&&atom.item.type==='direction'&&atoms[index-1].item.type==='direction'?4:0;metrics.leadingOverlap=leadingOverlap;metrics.groupWidth-=leadingOverlap;return{atom,metrics}})}
 function drawComboIcons(c,startX,startY,maxX){
   if(directionDisplay==='numpad')return drawNumpadComboIcons(c,startX,startY,maxX);
   let x=startX,y=startY;const rowHeight=70,rangeSegments=new Map,layout=buildCommandLayout(combo),newline=()=>{x=startX;y+=rowHeight};
   const drawAtom=(atom,metrics)=>{
+    if(metrics.leadingOverlap&&x>startX)x-=metrics.leadingOverlap;
     const item=atom.item,{baseWidth,countWidth,annotationWidths,groupWidth,code,caption}=metrics,groupX=x,groupY=y;
     if(item.footnote&&!item.footnoteGroup){c.fillStyle='rgba(40,118,136,.12)';c.beginPath();c.roundRect(groupX-6,groupY-3,groupWidth+12,62,12);c.fill();c.strokeStyle='#58bfd8';c.lineWidth=1.5;c.stroke()}
     let tx=x,ty=y;
@@ -53,12 +55,13 @@ function drawComboIcons(c,startX,startY,maxX){
     x+=2;
   };
   layout.forEach(segment=>{
-    const entries=segment.atoms.map(atom=>({atom,metrics:measureArrowCanvasAtom(c,atom)})),segmentWidth=entries.reduce((sum,entry)=>sum+entry.metrics.groupWidth,0);
+    const entries=measureArrowCanvasEntries(c,segment.atoms),segmentWidth=entries.reduce((sum,entry)=>sum+entry.metrics.groupWidth,0);
     if(segmentWidth<=maxX-startX){
       if(x+segmentWidth>maxX&&x>startX)newline();
       entries.forEach(entry=>drawAtom(entry.atom,entry.metrics));
     }else entries.forEach(entry=>{
-      if(x+entry.metrics.groupWidth>maxX&&x>startX)newline();
+      const lineWidth=entry.metrics.groupWidth+(x===startX?entry.metrics.leadingOverlap:0);
+      if(x+lineWidth>maxX&&x>startX)newline();
       drawAtom(entry.atom,entry.metrics);
     });
   });
