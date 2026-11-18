@@ -42,6 +42,7 @@
 .live-command-tail>*{flex:0 0 auto}
 .live-command-tail .named{width:max-content;min-width:max-content;white-space:nowrap}
 .arrow-command-segment .direction-token.adjacent-direction{margin-left:-1px}
+.command-workspace{position:relative}
 @media(max-width:520px){
  .live #live .arrow-command-segment{gap:2px;row-gap:9px}
  .live #live .numpad-command-segment{gap:0;row-gap:7px}
