@@ -84,7 +84,7 @@ function savePngIcons(){
   c.fillStyle=accent;c.fillRect(55,50,8,530);c.fillStyle='#171d24';c.beginPath();c.roundRect(63,50,1082,530,22);c.fill();
   c.fillStyle='#f5f7fa';c.font=`900 44px ${font}`;c.fillText($('#character').value.trim()||'CHARACTER',105,125);
   c.fillStyle='#9ca6b5';c.font=`700 17px ${font}`;c.fillText(stringMode?'STRING GUIDE':'COMBO GUIDE',105,155);
-  if(!stringMode){c.textAlign='right';c.fillText('DAMAGE',1095,92);c.fillStyle='#f1b84b';c.font=`900 58px ${font}`;c.fillText($('#damage').value||'0',1095,148);c.textAlign='left'}
+  const damageValue=visibleDamageValue();if(!stringMode&&damageValue){c.textAlign='right';c.fillText('DAMAGE',1095,92);c.fillStyle='#f1b84b';c.font=`900 58px ${font}`;c.fillText(damageValue,1095,148);c.textAlign='left'}
   const context=activeContextTag();canvasTag(c,360,116,context.label,context.color);
   c.strokeStyle='#2d3540';c.beginPath();c.moveTo(105,184);c.lineTo(1100,184);c.stroke();
   const comboRender=renderComboLayerForCard(),comboLayer=comboRender.layer,contentHeight=comboRender.contentHeight,comboScale=comboRender.scale;c.drawImage(comboLayer,0,0,comboRender.width,contentHeight,105,195,comboRender.width*comboScale,contentHeight*comboScale);
